@@ -1,1 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Churn Prediction</title>
 
+    <!-- Import modern Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            /* Vibrant modern gradient background */
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 20px;
+            color: #333;
+        }
+
+        .container {
+            /* Glassmorphism effect */
+            background: rgba(255, 255, 255, 0.95);
+            padding: 45px;
+            max-width: 1100px;
+            width: 100%;
+            margin: auto;
+            border-radius: 20px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        h2 {
+            text-align: center;
+            color: #1a202c;
+            margin-bottom: 35px;
+            font-size: 2.2rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            position: relative;
+        }
+
+        /* Decorative line under the title */
+        h2::after {
+            content: '';
+            display: block;
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            margin: 12px auto 0;
+            border-radius: 2px;
+        }
+
+        .grid {
+            display: grid;
+            /* Responsive grid that adjusts columns automatically */
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.2s ease;
+        }
+
+        /* Subtle lift effect on hover */
+        .field:hover {
+            transform: translateY(-2px);
+        }
+
+        label {
+            font-size: 1.05rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #4a5568;
+        }
+
+        select, input {
+            padding: 14px 16px;
+            border-radius: 10px;
+            border: 2px solid #e2e8f0;
+            font-size: 1.05rem;
+            font-family: 'Poppins', sans-serif;
+            color: #2d3748;
+            background-color: #f8fafc;
+            transition: all 0.3s ease;
+            outline: none;
+            cursor: pointer;
+        }
+
+        /* Focus states for accessibility and aesthetics */
+        select:focus, input:focus {
+            border-color: #667eea;
+            background-color: #fff;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+        }
+
+        button {
+            margin-top: 40px;
+            padding: 18px;
+            width: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-size: 1.25rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 10px 20px rgba(118, 75, 162, 0.3);
+            letter-spacing: 1px;
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 25px rgba(118, 75, 162, 0.4);
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        /* Styling for the result boxes */
+        .result-box, .result {
+            margin-top: 40px;
+            padding: 30px;
+            background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+            border-left: 6px solid #667eea;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        .result-box h2, .result h3 {
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+            color: #2d3748;
+            text-align: left;
+        }
+
+        .result-box h2::after, .result h3::after {
+            display: none;
+        }
+
+        .result-box p, .result p {
+            font-size: 1.2rem;
+            color: #4a5568;
+            margin-bottom: 12px;
+        }
+
+        .result-box p strong, .result p b {
+            color: #1a202c;
+            font-weight: 600;
+        }
+
+        /* Smooth fade-in animation for results */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Responsive adjustments for mobile */
+        @media (max-width: 600px) {
+            .container {
+                padding: 25px;
+            }
+            h2 {
+                font-size: 1.8rem;
+            }
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+    <h2>AI Customer Churn Prediction</h2>
+
+    <form action="/predict" method="post">
+        <div class="grid">
+
+            <div class="field">
+                <label>Gender</label>
+                <select name="gender">
+                    <option value="0">Female</option>
+                    <option value="1">Male</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label>Senior Citizen</label>
+                <select name="SeniorCitizen">
+                    <option value="0">No</option>
+                    <option value="1">Yes</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label>Has Partner</label>
+                <select name="Partner">
+                    <option value="0">No</option>
+                    <option value="1">Yes</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label>Has Dependents</label>
+                <select name="Dependents">
+                    <option value="0">No</option>
+                    <option value="1">Yes</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label>Tenure (Months)</label>
+                <input type="number" name="tenure" required placeholder="e.g. 12">
+            </div>
+
+            <div class="field">
+                <label>Phone Service</label>
+                <select name="PhoneService">
+                    <option value="0">No</option>
+                    <option value="1">Yes</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label>Multiple Lines</label>
+                <select name="MultipleLines">
+                    <option value="0">No</option>
+                    <option value="1">Yes</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label>Internet Service</label>
+                <select name="InternetService">
+                    <option value="0">DSL</option>
+                    <option value="1">Fiber Optic</option>
+                    <option value="2">No Internet</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label>Online Security</label>
+                <select name="OnlineSecurity">
+                    <option value="0">No</option>
+                    <option value="1">Yes</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label>Online Backup</label>
+                <select name="OnlineBackup">
+                    <option value="0">No</option>
+                    <option value="1">Yes</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label>Device Protection</label>
+                <select name="DeviceProtection">
+                    <option value="0">No</option>
+                    <option value="1">Yes</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label>Tech Support</label>
+                <select name="TechSupport">
+                    <option value="0">No</option>
+                    <option value="1">Yes</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label>Streaming TV</label>
+                <select name="StreamingTV">
+                    <option value="0">No</option>
+                    <option value="1">Yes</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label>Streaming Movies</label>
+                <select name="StreamingMovies">
+                    <option value="0">No</option>
+                    <option value="1">Yes</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label>Contract Type</label>
+                <select name="Contract">
+                    <option value="0">Month-to-Month</option>
+                    <option value="1">One Year</option>
+                    <option value="2">Two Year</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label>Paperless Billing</label>
+                <select name="PaperlessBilling">
+                    <option value="0">No</option>
+                    <option value="1">Yes</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label>Payment Method</label>
+                <select name="PaymentMethod">
+                    <option value="0">Bank Transfer</option>
+                    <option value="1">Credit Card</option>
+                    <option value="2">Electronic Check</option>
+                    <option value="3">Mailed Check</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label>Monthly Charges</label>
+                <input type="number" step="0.01" name="MonthlyCharges" required placeholder="e.g. 59.99">
+            </div>
+
+            <div class="field">
+                <label>Total Charges</label>
+                <input type="number" step="0.01" name="TotalCharges" required placeholder="e.g. 1200.50">
+            </div>
+
+        </div>
+
+        <button type="submit">Predict Churn Risk</button>
+    </form>
+
+    {% if churn_status %}
+    <div class="result-box">
+        <h2>Prediction Results</h2>
+        <p><strong>Churn Status:</strong> {{ churn_status }}</p>
+        <p><strong>Risk Level:</strong> {{ risk_level }}</p>
+    </div>
+    {% endif %}
+
+    {% if prediction_text %}
+    <div class="result">
+        <h3>{{ prediction_text }}</h3>
+        <p><b>Churn Probability:</b> {{ churn_prob }}%</p>
+        <p><b>Risk Level:</b> {{ risk_level }}</p>
+    </div>
+    {% endif %}
+</div>
+
+</body>
+</html>
